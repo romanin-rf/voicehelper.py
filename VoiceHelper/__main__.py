@@ -1,29 +1,29 @@
-import VoiceHelper as VH
+from . import VoiceHelper
 from rich.console import Console
 
+# Консоль
 c = Console()
-vh = VH.VoiceHelper()
 
-def log(text: str) -> None:
-    c.print(f"[blue]YOU[/] -> [green]{text}[/]")
+# Класс нейросети
+c.clear()
+c.rule("Запуск")
+vh = VoiceHelper.VoiceHelper()
 
-@vh.add_command(["привет", "здравствуй"])
+# Команды
+@vh.add_command(["Привет"])
 def Hello(text: str):
-    log(text)
-    vh.say("Привет!")
+    vh.say("Здравствуйте!")
 
-@vh.add_command(["пока", "выключить", "спокойной ночи"])
+@vh.add_command(["Пока"])
 def GoodBye(text: str):
-    log(text)
-    vh.say("Пока!")
+    vh.say("До свидания!")
     vh.stop()
 
 @vh.add_command()
-def Testing(text: str):
-    log(text)
+def cLogger(text: str) -> None:
+    c.print(f"[red]You[/] [green]->[/] [yellow]{text}[/]")
 
-# Включение
+# Запуск
 if __name__ == "__main__":
-    c.clear()
-    c.rule("LOGS")
+    c.rule("Логи")
     vh.start()
