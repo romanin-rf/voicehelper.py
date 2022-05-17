@@ -28,7 +28,9 @@ class SpeechSynthesizer:
         speaker: Optional[Literal['aidar', 'baya', 'kseniya', 'xenia']]=None,
         put_accent: Optional[bool]=None,
         put_yo: Optional[bool]=None,
-        device_type: Optional[Literal['cpu', 'gpu']]=None
+        device_type: Optional[Literal['cpu', 'gpu']]=None,
+        *,
+        last_callback: Optional[Any]=None
     ) -> None:
         self.Language = language or "ru"
         self.ModelID = model_id or "ru_v3"
@@ -36,7 +38,6 @@ class SpeechSynthesizer:
         self.Speaker = speaker or "baya"
         self.PutAccent = put_accent or True
         self.PutYo = put_yo or True
-
         self.TorchDevice = torch.device(device_type or 'cpu')
         try:
             self.Model, self._, = torch.hub.load(
@@ -53,6 +54,7 @@ class SpeechSynthesizer:
                 language=self.Language,
                 speaker=self.ModelID
             )
+        self.LastCallback = last_callback
         self.Model.to(self.TorchDevice)
     
     def __play(self, audio) -> None:
@@ -73,6 +75,8 @@ class SpeechSynthesizer:
         self.__play(
             self.__generate_audio(text)
         )
+        if not(self.LastCallback is None):
+            self.LastCallback(text)
 
 class SpeechRecognition:
     def __init__(
@@ -81,7 +85,8 @@ class SpeechRecognition:
         *,
         device_id: Optional[int]=None,
         sample_rate: Optional[int]=None,
-        models_path: Optional[str]=None
+        models_path: Optional[str]=None,
+        last_callback: Optional[Any]=None
     ) -> None:
         self.Name: str = name or "ru_small"
         self.DeviceID: int = device_id or 1
@@ -92,6 +97,7 @@ class SpeechRecognition:
                 models_path=models_path
             )
         )
+        self.LastCallback = last_callback
         self.Queue = queue.Queue()
         self.Listening: bool = False
     
@@ -113,6 +119,8 @@ class SpeechRecognition:
                     answer = json.loads(rec.Result())["text"]
                     if answer != "":
                         callback(answer)
+                        if not(self.LastCallback is None):
+                            self.LastCallback(answer)
 
     def start(self, callback) -> NoReturn:
         self.Listening = True
@@ -124,18 +132,18 @@ class SpeechRecognition:
 # Классы обработки
 class Command:
     def __init__(self, pattern: Optional[Union[str, list[str]]], method: Any, *, mrt: Optional[int]=None) -> None:
-        self.pattern = pattern
+        self.pattern: Optional[Union[str, list[str]]] = pattern
         self.method = method
         self.mrt = mrt or 90
     
     def get(self, text: Optional[str]) -> Optional[Any]:
-        if not(text is None):
-            if isinstance(text, str):
+        if not(self.pattern is None):
+            if isinstance(self.pattern, str):
                 if fuzz.ratio(self.pattern, text) >= self.mrt:
                     return self.method
-            elif isinstance(text, list):
-                for i in text:
-                    if fuzz.ratio(self.pattern, i) >= self.mrt:
+            elif isinstance(self.pattern, list):
+                for i in self.pattern:
+                    if fuzz.ratio(i, text) >= self.mrt:
                         return self.method
         else:
             return self.method
@@ -153,7 +161,9 @@ class VoiceHandler:
             text = text.lower()
         elif isinstance(text, list):
             text = [i.lower() for i in text]
-        self.commands.append(Command(text, method))
+        self.commands.append(
+            Command(text, method, mrt=self.mrt)
+        )
 
     def exsist_method(self, method: Any) -> bool:
         for i in self.commands:

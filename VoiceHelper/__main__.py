@@ -1,8 +1,8 @@
-from . import *
+import VoiceHelper as VH
 from rich.console import Console
 
 c = Console()
-vh = VoiceHelper()
+vh = VH.VoiceHelper()
 
 def log(text: str) -> None:
     c.print(f"[blue]YOU[/] -> [green]{text}[/]")
