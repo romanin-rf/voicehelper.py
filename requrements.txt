@@ -1,0 +1,6 @@
+numpy
+fuzzywuzzy
+sounddevice
+torch
+vosk
+silero
