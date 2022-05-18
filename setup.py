@@ -20,7 +20,7 @@ setuptools.setup(
     name="voicehelper.py",
     version="0.1.1",
     description="These are two neural networks connected by the same module. One for recognition, the other for voice generation.",
-    long_description=open("README.md", "r").read(),
+    long_description=open("README.md", "r", errors="ignore").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/romanin-rf/voicehelper.py",
     author="Romanin",
