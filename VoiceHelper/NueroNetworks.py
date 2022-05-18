@@ -1,9 +1,10 @@
 import os
 import time
-from . import unitsdata
 import sounddevice as sd
 import queue
 import json
+# More
+from . import unitsdata
 # Big Libs
 import vosk
 import torch
@@ -128,6 +129,7 @@ class SpeechRecognition:
                         if self.LastCallback is not None:
                             self.LastCallback(answer)
                         callback(answer)
+                        self.Queue.task_done()
 
     def start(self, callback) -> NoReturn:
         self.Listening = True

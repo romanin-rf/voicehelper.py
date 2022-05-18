@@ -14,16 +14,17 @@ class VoiceHelper:
         self.CommandsHandler = CommandsHandler.CommandsHandler(self.AccuracyThreshold)
     
     def __callback(self, text: str):
-        method = self.CommandsHandler.search_method(text)
-        if method is not None:
-            method(text)
+        data = self.CommandsHandler.search_method(text)
+        if data is not None:
+            method, args = data
+            method(*args)
     
     def add_command(self, pattern: Optional[Union[str, list[str]]]=None):
         def adder(method):
             if not self.CommandsHandler.exsist_method(method):
                 self.CommandsHandler.add_method(pattern, method)
-            def wrapper(text: str):
-                return method(text)
+            def wrapper(*args):
+                return method(*args)
             return wrapper
         return adder
     

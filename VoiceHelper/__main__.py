@@ -10,16 +10,16 @@ c.rule("Запуск")
 vh = VoiceHelper.VoiceHelper()
 
 # Команды
-@vh.add_command(["Привет"])
+@vh.add_command(["скажи <text>"])
 def Hello(text: str):
-    vh.say("Здравствуйте!")
+    vh.say(text)
 
-@vh.add_command(["Пока"])
-def GoodBye(text: str):
+@vh.add_command("пока")
+def GoodBye():
     vh.say("До свидания!")
     vh.stop()
 
-@vh.add_command()
+@vh.add_command("<text>")
 def cLogger(text: str) -> None:
     c.print(f"[red]You[/] [green]->[/] [yellow]{text}[/]")
 
