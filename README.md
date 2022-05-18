@@ -2,6 +2,7 @@
 ## Описание
 Это модуль соединивший в себе две нейронные сети. Для упрощения создания голосового помошника.
 ## Установка
+- Windows 10:
 ```cmd
 pip install https://github.com/romanin-rf/voicehelper.py/releases/download/v0.1.1/voicehelper.py-0.1.1-py3.9.whl
 ```
