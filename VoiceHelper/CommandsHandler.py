@@ -2,6 +2,10 @@ import vbml
 from typing import Optional, Union, Any
 
 # Классы обработки
+class Event:
+    def __init__(self, text: str) -> None:
+        self.text = text
+
 class Command:
     def __init__(
         self,
@@ -39,11 +43,11 @@ class CommandsHandler:
                 if isinstance(i.pattern, vbml.Pattern):
                     d = self.patcher.check(i.pattern, text)
                     if isinstance(d, dict):
-                        return i.method, tuple(d.values())
+                        return i.method, tuple([Event(text), *d.values()])
                 elif isinstance(i.pattern, list):
                     for p in i.pattern:
                         d = self.patcher.check(p, text)
                         if isinstance(d, dict):
-                            return i.method, tuple(d.values())
+                            return i.method, tuple([Event(text), *d.values()])
             else:
-                return i.method, tuple([])
+                return i.method, tuple([Event(text)])

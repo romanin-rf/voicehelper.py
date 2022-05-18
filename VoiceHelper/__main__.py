@@ -7,20 +7,37 @@ c = Console()
 # Класс нейросети
 c.clear()
 c.rule("Запуск")
-vh = VoiceHelper.VoiceHelper()
+
+# Процесс иницализации
+try:
+    ssynth = VoiceHelper.SpeechSynthesizer(
+        device_type="cuda"
+    )
+except:
+    ssynth = VoiceHelper.SpeechSynthesizer(
+        device_type="cpu"
+    )
+vh = VoiceHelper.VoiceHelper(
+    ssynth,
+    VoiceHelper.SpeechRecognition()
+)
 
 # Команды
+@vh.add_command("привет")
+def Hello(event: VoiceHelper.Event):
+    vh.say("Ага, я здесь!")
+
 @vh.add_command(["скажи <text>"])
-def Hello(text: str):
+def cSay(event: VoiceHelper.Event, text: str):
     vh.say(text)
 
 @vh.add_command("пока")
-def GoodBye():
+def cGoodBye(event: VoiceHelper.Event):
     vh.say("До свидания!")
     vh.stop()
 
 @vh.add_command("<text>")
-def cLogger(text: str) -> None:
+def cLogger(event: VoiceHelper.Event, text: str) -> None:
     c.print(f"[red]You[/] [green]->[/] [yellow]{text}[/]")
 
 # Запуск

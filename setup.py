@@ -18,7 +18,7 @@ def globalizer(dirpath: str) -> list:
 
 setuptools.setup(
     name="voicehelper.py",
-    version="0.1.1",
+    version="0.1.2",
     description="These are two neural networks connected by the same module. One for recognition, the other for voice generation.",
     long_description=open("README.md", "r", errors="ignore").read(),
     long_description_content_type="text/markdown",

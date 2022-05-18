@@ -36,7 +36,7 @@ class SpeechSynthesizer:
         language: Optional[str]=None,
         model_id: Optional[str]=None,
         sample_rate: Optional[Literal[48000, 24000, 16000, 8000]]=None,
-        speaker: Optional[Literal['aidar', 'baya', 'kseniya', 'xenia']]=None,
+        speaker: Optional[str]=None,
         put_accent: Optional[bool]=None,
         put_yo: Optional[bool]=None,
         device_type: Optional[Literal["cpu", "cuda"]]=None,
@@ -70,7 +70,7 @@ class SpeechSynthesizer:
         time.sleep((len(audio) / self.SampleRate) + 0.5)
         sd.stop()
     
-    def __generate_audio(self, text: str):
+    def __generate_audio(self, text: str) -> Any:
         return self.Model.apply_tts(
             text=text,
             speaker=self.Speaker,
@@ -78,6 +78,12 @@ class SpeechSynthesizer:
             put_accent=self.PutAccent,
             put_yo=self.PutYo
         )
+    
+    def get_audio(self, text: str) -> Any:
+        return self.__generate_audio(text)
+    
+    def play_audio(self, audio: Any):
+        self.__play(audio)
     
     def say(self, text: str) -> None:
         self.__play(
@@ -126,10 +132,10 @@ class SpeechRecognition:
                 if rec.AcceptWaveform(self.Queue.get()):
                     answer = json.loads(rec.Result())["text"]
                     if answer != "":
+                        self.Queue.task_done()
                         if self.LastCallback is not None:
                             self.LastCallback(answer)
                         callback(answer)
-                        self.Queue.task_done()
 
     def start(self, callback) -> NoReturn:
         self.Listening = True
