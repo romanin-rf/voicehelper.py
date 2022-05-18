@@ -1,4 +1,4 @@
-from . import VoiceHelper
+import VoiceHelper
 from rich.console import Console
 
 # Консоль
