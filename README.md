@@ -20,12 +20,12 @@ def log(user: str, text: str) -> None:
 
 c.rule("Запуск")
 # Импорт VoiceHelper-a
-from VoiceHelper.VoiceHelper import *
+from VoiceHelper import *
 
 # Иницализация
 vh = VoiceHelper(
-    speech_synthesizer=NueroNetworks.SpeechSynthesizer(thread_count=4),
-    speech_recognition=NueroNetworks.SpeechRecognition()
+    speech_synthesizer=SpeechSynthesizer(thread_count=4),
+    speech_recognition=SpeechRecognition()
 )
 
 # Команды
