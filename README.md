@@ -4,7 +4,7 @@
 ## Установка
 - **Windows**:
 ```cmd
-pip install git+https://github.com/romanin-rf/voicehelper.py.git
+pip install https://github.com/romanin-rf/voicehelper.py/releases/download/v0.1.2.1/voicehelper.py-0.1.2.1-py39-none-win_amd64.whl
 ```
 ## Пример
 - main.py
