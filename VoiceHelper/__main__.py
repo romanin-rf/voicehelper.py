@@ -4,7 +4,7 @@ from rich.console import Console
 # Консоль
 c = Console()
 
-# Класс нейросети
+# Очистка консоли
 c.clear()
 c.rule("Запуск")
 

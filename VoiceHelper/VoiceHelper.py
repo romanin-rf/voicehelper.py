@@ -1,5 +1,6 @@
 from . import CommandsHandler
-from typing import Optional, Union, NoReturn, Any
+from . import NueroNetworks
+from typing import Optional, Union, NoReturn
 
 class VoiceHelper:
     def __init__(
@@ -8,14 +9,12 @@ class VoiceHelper:
         speech_recognition=None,
         accuracy_threshold: Optional[int]=None
     ) -> None:
-        if (speech_synthesizer is None) or (speech_recognition is None):
-            from . import NueroNetworks
         self.SSynth = speech_synthesizer or NueroNetworks.SpeechSynthesizer()
         self.SRec = speech_recognition or NueroNetworks.SpeechRecognition()
         self.AccuracyThreshold = accuracy_threshold or 90
         self.CommandsHandler = CommandsHandler.CommandsHandler(self.AccuracyThreshold)
     
-    def __callback(self, text: str):
+    def __callback(self, text: str) -> None:
         data = self.CommandsHandler.search_method(text)
         if data is not None:
             method, args = data
@@ -33,10 +32,10 @@ class VoiceHelper:
     def say(self, text: str) -> None:
         self.SSynth.say(text)
     
-    def get_audio(self, text: str) -> Any:
+    def get_audio(self, text: str) -> NueroNetworks.torch.Tensor:
         return self.SSynth.get_audio(text)
 
-    def play_audio(self, audio: Any) -> None:
+    def play_audio(self, audio: NueroNetworks.torch.Tensor) -> None:
         self.SSynth.play_audio(audio)
     
     def start(self) -> NoReturn:
