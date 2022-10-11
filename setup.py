@@ -33,7 +33,7 @@ else:
 # Установка
 setuptools.setup(
     name="voicehelper.py",
-    version="0.1.4",
+    version="0.1.5",
     description="These are two neural networks connected by the same module. One for recognition, the other for voice generation.",
     long_description=open("README.md", "r", errors="ignore").read(),
     long_description_content_type="text/markdown",
@@ -46,6 +46,6 @@ setuptools.setup(
     include_package_data=True,
     cmdclass=cmdclass,
     python_requires=">=3.9",
-    install_requires=["numpy", "sounddevice", "pysoundfile", "torch", "vosk", "silero", "vbml", "rich"],
-    setup_requires=["numpy", "sounddevice", "pysoundfile", "torch", "vosk", "silero", "vbml", "rich"]
+    install_requires=["numpy", "sounddevice", "pysoundfile", "requests", "wget", "torch", "vosk", "silero", "vbml", "rich"],
+    setup_requires=["numpy", "sounddevice", "pysoundfile", "requests", "wget", "torch", "vosk", "silero", "vbml", "rich"]
 )

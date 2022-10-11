@@ -5,8 +5,12 @@ import sounddevice as sd
 import soundfile as sf
 import queue
 import json
+import wget
+import requests
+import zipfile
 # More
-from . import unitsdata
+from . import Unitsdata 
+from . import Exceptions
 # Big Libs
 import vosk
 import torch
@@ -15,18 +19,30 @@ from typing import Literal, Optional, NoReturn, Any
 
 # Функции
 def get_model_sr_path(name: str, *, models_path: Optional[str]=None) -> Optional[str]:
-    models_path = models_path or unitsdata.VOSK_MODELS_DIR
+    models_path = models_path or Unitsdata.VOSK_MODELS_DIR
     if name in os.listdir(models_path):
         return models_path + "/" + name
+    model_path, models_list = models_path + "/" + name, json.loads(requests.get(Unitsdata.VOSK_MODELS_LIST_URL).content)
+    if name in models_list:
+        zipfile_path = os.path.join(models_path.replace("/", "\\"), "".join([name, ".zip"]))
+        wget.download(models_list[name]["url"], zipfile_path);print()
+        with zipfile.ZipFile(zipfile_path) as zf:
+            zf.extractall(models_path.replace("/", "\\"))
+        os.remove(zipfile_path)
+        if os.path.exists(model_path):
+            return model_path
+        else:
+            raise Exceptions.AfterZipFileUnpackingCriticalError()
+    else:
+        raise Exceptions.ModelNotFoundError()
 
 def get_model_ss_path(lang: str, model_id: str, *, models_path: Optional[str]=None) -> Optional[str]:
-    models_path = models_path or unitsdata.SILERO_MODELS_DIR
-    name = f"{lang}-{model_id}.pt"
+    models_path, name = models_path or Unitsdata.SILERO_MODELS_DIR, f"{lang}-{model_id}.pt"
     if name in os.listdir(models_path):
         return models_path + "/" + name
 
 def generate_ss_model_path(lang: str, model_id: str, *, models_path: Optional[str]=None) -> Optional[str]:
-    models_path = models_path or unitsdata.SILERO_MODELS_DIR
+    models_path = models_path or Unitsdata.SILERO_MODELS_DIR
     model_path = models_path + "/" + f"{lang}-{model_id}.pt"
     if not os.path.exists(model_path):
         return model_path
@@ -115,7 +131,7 @@ class SpeechRecognition:
         models_path: Optional[str]=None,
         last_callback: Optional[Any]=None
     ) -> None:
-        self.Name: str = name or "ru_small"
+        self.Name: str = name or "ru-rus_small"
         self.SampleRate: int = sample_rate or 16000
         self.DeviceID: int = device_id or 1
         self.Model = vosk.Model(
