@@ -6,6 +6,11 @@
 ```cmd
 pip install https://github.com/romanin-rf/voicehelper.py/releases/download/v0.1.4/voicehelper.py-0.1.4-py39-none-win_amd64.whl
 ```
+## Название моделей для загрузки
+- Для [SpeechSynthesizer](https://github.com/snakers4/silero-models#v3)
+- Для [SpeechRecognition](https://github.com/romanin-rf/voicehelper.py-models#for-speechrecognition)
+
+
 ## Пример
 - main.py
 ```python
