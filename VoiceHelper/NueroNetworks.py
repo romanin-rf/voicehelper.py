@@ -1,6 +1,8 @@
 import os
+import io
 import time
 import sounddevice as sd
+import soundfile as sf
 import queue
 import json
 # More
@@ -70,7 +72,7 @@ class SpeechSynthesizer:
         time.sleep((len(audio) / self.SampleRate) + 0.5)
         sd.stop()
     
-    def __generate_audio(self, text: str) -> Any:
+    def __generate_audio(self, text: str) -> torch.Tensor:
         return self.Model.apply_tts(
             text=text,
             speaker=self.Speaker,
@@ -79,10 +81,21 @@ class SpeechSynthesizer:
             put_yo=self.PutYo
         )
     
-    def get_audio(self, text: str) -> Any:
+    def get_audio_bytes(
+        self,
+        text: str,
+        form: Literal["WAV", "WAVEX", "OGG", "AIFF", "CAF", "RAW"]=None,
+        subtype: Literal["DOUBLE", "FLOAT", "PCM_U8", "PCM_S8", "PCM_16", "PCM_24", "PCM_32"]=None
+    ) -> bytes:
+        bio, form, subtype = io.BytesIO(), form or "WAV", subtype or "PCM_32"
+        sf.write(bio, self.__generate_audio(text), self.SampleRate, subtype="FLOAT", format="WAV")
+        bio.seek(0)
+        return bio.read()
+    
+    def get_audio(self, text: str) -> torch.Tensor:
         return self.__generate_audio(text)
     
-    def play_audio(self, audio: Any):
+    def play_audio(self, audio: Any) -> None:
         self.__play(audio)
     
     def say(self, text: str) -> None:
@@ -115,7 +128,7 @@ class SpeechRecognition:
         self.Queue = queue.Queue()
         self.Listening: bool = False
     
-    def __callback(self, indata, frames: int, time, status):
+    def __callback(self, indata, frames: int, time, status: sd.CallbackFlags):
         self.Queue.put(bytes(indata))
     
     def __stream(self, callback) -> None:
