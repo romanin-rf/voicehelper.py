@@ -4,7 +4,7 @@
 ## Установка
 - **Windows**:
 ```cmd
-pip install voicehelper.py
+pip install --upgrade voicehelper.py
 ```
 ## Название моделей для загрузки
 - Для [SpeechSynthesizer](https://github.com/snakers4/silero-models#v3)
