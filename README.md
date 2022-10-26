@@ -65,7 +65,7 @@ if __name__ == "__main__":
 ```python
 from VoiceHelper.NueroNetworks import SpeechSynthesizer
 
-ss = VoiceHelper.SpeechSynthesizer(sample_rate=48000, thread_count=1) # по умолчанию стоит русская речь
+ss = SpeechSynthesizer(sample_rate=48000, thread_count=1) # по умолчанию стоит русская речь
 
 with open("test.wav", "wb") as file:
     file.write(ss.get_audio_bytes("Привет!", "WAV", "PCM_32"))
