@@ -12,7 +12,7 @@ pip install --upgrade voicehelper.py
 
 
 ## Пример
-- main.py
+- Пример создания Голосового Ассистента
 ```python
 import VoiceHelper
 from rich.console import Console
@@ -60,4 +60,13 @@ def cLogger(event: VoiceHelper.Event, text: str) -> None:
 if __name__ == "__main__":
     c.rule("Логи")
     vh.start()
+```
+- Пример генерации голоса
+```python
+from VoiceHelper.NueroNetworks import SpeechSynthesizer
+
+ss = VoiceHelper.SpeechSynthesizer(sample_rate=48000, thread_count=1) # по умолчанию стоит русская речь
+
+with open("test.wav", "wb") as file:
+    file.write(ss.get_audio_bytes("Привет!", "WAV", "PCM_32"))
 ```
