@@ -1,7 +1,8 @@
 import os
 import io
 import time
-import sounddevice as sd
+try: import sounddevice as sd
+except: sd = None
 import soundfile as sf
 import queue
 import json
@@ -69,7 +70,8 @@ class SpeechSynthesizer:
         self.Speaker = speaker or "baya"
         self.PutAccent = put_accent or True
         self.PutYo = put_yo or True
-        self.TorchDevice = torch.device((device_type or 'cpu'))
+        try: self.TorchDevice = torch.device((device_type or 'cpu'))
+        except: self.TorchDevice = torch.device('cpu')
         self.ThreadCount = thread_count or 2
         torch.set_num_threads(self.ThreadCount)
         model_path = get_model_ss_path(self.Language, self.ModelID, models_path=models_path)
@@ -84,9 +86,10 @@ class SpeechSynthesizer:
         self.LastCallback = last_callback
     
     def __play(self, audio) -> None:
-        sd.play(audio)
-        time.sleep((len(audio) / self.SampleRate) + 0.5)
-        sd.stop()
+        if sd is not None:
+            sd.play(audio)
+            time.sleep((len(audio) / self.SampleRate) + 0.5)
+            sd.stop()
     
     def __generate_audio(self, text: str) -> torch.Tensor:
         return self.Model.apply_tts(
@@ -144,27 +147,30 @@ class SpeechRecognition:
         self.Queue = queue.Queue()
         self.Listening: bool = False
     
-    def __callback(self, indata, frames: int, time, status: sd.CallbackFlags):
+    def __callback(self, indata, frames: int, time, status):
         self.Queue.put(bytes(indata))
     
     def __stream(self, callback) -> None:
-        with sd.RawInputStream(
-            samplerate=self.SampleRate,
-            blocksize=8000,
-            device=self.DeviceID,
-            dtype="int16",
-            channels=1,
-            callback=self.__callback
-        ):
-            rec = vosk.KaldiRecognizer(self.Model, self.SampleRate)
-            while self.Listening:
-                if rec.AcceptWaveform(self.Queue.get()):
-                    answer = json.loads(rec.Result())["text"]
-                    if answer != "":
-                        self.Queue.task_done()
-                        if self.LastCallback is not None:
-                            self.LastCallback(answer)
-                        callback(answer)
+        if sd is not None:
+            with sd.RawInputStream(
+                samplerate=self.SampleRate,
+                blocksize=8000,
+                device=self.DeviceID,
+                dtype="int16",
+                channels=1,
+                callback=self.__callback
+            ):
+                rec = vosk.KaldiRecognizer(self.Model, self.SampleRate)
+                while self.Listening:
+                    if rec.AcceptWaveform(self.Queue.get()):
+                        answer = json.loads(rec.Result())["text"]
+                        if answer != "":
+                            self.Queue.task_done()
+                            if self.LastCallback is not None:
+                                self.LastCallback(answer)
+                            callback(answer)
+        else:
+            self.Listening = False
 
     def start(self, callback) -> NoReturn:
         self.Listening = True
