@@ -24,10 +24,10 @@ def get_model_sr_path(name: str, *, models_path: Optional[str]=None) -> Optional
         return models_path + "/" + name
     model_path, models_list = models_path + "/" + name, json.loads(requests.get(Unitsdata.VOSK_MODELS_LIST_URL).content)
     if name in models_list:
-        zipfile_path = os.path.join(models_path.replace("/", "\\"), "".join([name, ".zip"]))
+        zipfile_path = os.path.join(models_path.replace("/", os.sep), "".join([name, ".zip"]))
         wget.download(models_list[name]["url"], zipfile_path);print()
         with zipfile.ZipFile(zipfile_path) as zf:
-            zf.extractall(models_path.replace("/", "\\"))
+            zf.extractall(models_path.replace("/", os.sep))
         os.remove(zipfile_path)
         if os.path.exists(model_path):
             return model_path
@@ -104,7 +104,7 @@ class SpeechSynthesizer:
         subtype: Literal["DOUBLE", "FLOAT", "PCM_U8", "PCM_S8", "PCM_16", "PCM_24", "PCM_32"]=None
     ) -> bytes:
         bio, form, subtype = io.BytesIO(), form or "WAV", subtype or "PCM_32"
-        sf.write(bio, self.__generate_audio(text), self.SampleRate, subtype="FLOAT", format="WAV")
+        sf.write(bio, self.__generate_audio(text), self.SampleRate, subtype=subtype, format=form)
         bio.seek(0)
         return bio.read()
     

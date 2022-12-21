@@ -2,17 +2,19 @@
 ## Описание
 Это модуль соединивший в себе две нейронные сети. Для упрощения создания голосового помошника.
 ## Установка
-- **Windows**:
 ```cmd
-pip install https://github.com/romanin-rf/voicehelper.py/releases/download/v0.1.5/voicehelper.py-0.1.5-py39-none-win_amd64.whl
+pip install --upgrade voicehelper.py
 ```
+
+`!!! ВНИМЕНИЕ !!!` Установка **torch** должна происходить отдельно. [Сайт PyTorch Installation](https://pytorch.org/get-started/locally/#start-locally)
+
 ## Название моделей для загрузки
 - Для [SpeechSynthesizer](https://github.com/snakers4/silero-models#v3)
 - Для [SpeechRecognition](https://github.com/romanin-rf/voicehelper.py-models#for-speechrecognition)
 
 
 ## Пример
-- main.py
+- Пример создания Голосового Ассистента
 ```python
 import VoiceHelper
 from rich.console import Console
@@ -60,4 +62,13 @@ def cLogger(event: VoiceHelper.Event, text: str) -> None:
 if __name__ == "__main__":
     c.rule("Логи")
     vh.start()
+```
+- Пример генерации голоса
+```python
+from VoiceHelper.NueroNetworks import SpeechSynthesizer
+
+ss = SpeechSynthesizer(sample_rate=48000, thread_count=1) # по умолчанию стоит русская речь
+
+with open("test.wav", "wb") as file:
+    file.write(ss.get_audio_bytes("Привет!", "WAV", "PCM_32"))
 ```
